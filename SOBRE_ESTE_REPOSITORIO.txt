@@ -1,0 +1,56 @@
+REPOSITÓRIO: TradingView-Webhook-Bot
+TIPO: Fork Público (espelho do upstream)
+LINGUAGEM: Python
+URL (seu fork):    https://github.com/odilsonriquelme/TradingView-Webhook-Bot
+UPSTREAM (fork de): https://github.com/fabston/TradingView-Webhook-Bot (autor: fabston)
+
+DESCRIÇÃO
+---------
+Servidor web (Flask) que escuta ALERTAS DO TRADINGVIEW via webhook e os redistribui
+instantaneamente para múltiplos canais de notificação. Tudo configurável por canal.
+
+FLUXO:
+  TradingView dispara alerta -> POST em http://<IP>/webhook -> main.py valida a "key"
+  (precisa bater com sec_key no config.py) -> handler.send_alert() distribui aos canais ativos.
+
+CANAIS SUPORTADOS (confirmado no handler.py)
+---------------------------------------------
+- Telegram  (lib python-telegram-bot — telegram.Bot)
+- Discord   (discord_webhook — DiscordWebhook/DiscordEmbed)
+- Slack     (slack_webhook — Slack)
+- Twitter/X (tweepy — OAuthHandler/API)
+- Email     (smtplib + email.mime.text)
+Cada canal é ligado/desligado individualmente no config.py (send_*_alerts).
+Suporta variáveis do TradingView no texto ({{ticker}}, {{close}}, {{exchange}}, etc.)
+e roteamento dinâmico (o próprio alerta pode indicar telegram/discord/slack de destino).
+
+ARQUIVOS E SUAS FUNÇÕES
+------------------------
+main.py        → Servidor Flask. Rota /webhook (POST), valida sec_key, chama send_alert().
+                 Roda via waitress na porta 80. (46 linhas)
+handler.py     → send_alert(): envia para cada canal ativo (Telegram/Discord/Slack/
+                 Twitter/Email). (97 linhas)
+config.py      → Config central (tudo desativado por padrão): sec_key + credenciais e flags
+                 de cada canal (tg_token/channel, discord_webhook, slack_webhook,
+                 tw_ckey/csecret/atoken/asecret, email host/port/login/receivers). (45 linhas)
+requirements.txt → Dependências (flask, python-telegram-bot, tweepy, discord-webhook,
+                 slack-webhook, waitress).
+Dockerfile / docker-compose.yml → containerização (docker-compose build && up).
+assets/        → logo.png e bmac.png (imagens do README do fabston).
+.github/       → infra do projeto upstream: FUNDING.yml, ISSUE_TEMPLATEs, workflow stale.
+LICENSE        → licença do fabston.
+README.md      → README original do fabston (badges, About, Features, Installation, exemplo
+                 de alerta JSON). De terceiros — não editar.
+
+RELAÇÃO COM OUTROS REPOS
+------------------------
+- É o MESMO projeto que o repositório privado "Bot-Telegram" (que é uma cópia por upload
+  manual deste mesmo código, e foi arquivado). Este fork é a forma correta de manter o
+  projeto de terceiro. Código (handler/main/config) idêntico ao do Bot-Telegram.
+- Complementa o workflow de trading (Ape Bitcoiner): alertas de indicadores no TradingView
+  podem ser distribuídos automaticamente para os canais escolhidos.
+
+OBSERVAÇÃO (fork)
+-----------------
+Fork espelho do upstream do fabston. README/código são de terceiros — não editar.
+Push deste repo vai só para o SEU fork no GitHub.
